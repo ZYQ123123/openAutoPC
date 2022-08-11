@@ -40,7 +40,7 @@ QtVideoOutput::QtVideoOutput(configuration::IConfiguration::Pointer configuratio
     QMetaObject::invokeMethod(this, "createVideoOutput", Qt::BlockingQueuedConnection);
 }
 
-void QtVideoOutput::createVideoOutput()
+void QtVideoOutput::createVideoOutput() //modified by Joe Zhang
 {
     OPENAUTO_LOG(debug) << "[QtVideoOutput] create.";
     scrollArea_ = new QScrollArea;//creating a scroll area
@@ -58,8 +58,7 @@ void QtVideoOutput::createVideoOutput()
 
 bool QtVideoOutput::open()
 {
-    //printf("Test Open\n");
-    pkt = av_packet_alloc();
+    pkt = av_packet_alloc();//initialize decoder
     if (!pkt) {
         fprintf(stderr, "Packet not found\n");
         exit(1);
@@ -110,7 +109,7 @@ void QtVideoOutput::stop()
 
 void QtVideoOutput::write(uint64_t, const aasdk::common::DataConstBuffer& buffer)
 {
-    data = buffer.cdata;
+    data = buffer.cdata;//reading data
     data_size = buffer.size;
     while (data_size > 0) {
         printf("Receiving %d bytes\n", data_size);
@@ -158,7 +157,7 @@ void QtVideoOutput::onStopPlayback()
 }
 
 void QtVideoOutput::decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt){
-    int ret;
+    int ret;//decode
     ret = avcodec_send_packet(dec_ctx, pkt);
     if (ret < 0) {
         fprintf(stderr, "Error sending a packet for decoding\n");
@@ -177,7 +176,7 @@ void QtVideoOutput::decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pk
         }
 
         if(dec_ctx->frame_number){
-            QImage image = getQImageFromFrame(frame);
+            QImage image = getQImageFromFrame(frame);//convert AVFrame to QImage
             printf("saving frame %3d\n", dec_ctx->frame_number);
             imageLabel_->adjustSize();
             imageLabel_->setPixmap(QPixmap::fromImage(image));
